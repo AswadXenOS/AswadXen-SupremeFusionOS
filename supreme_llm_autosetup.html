@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supreme LLM Auto-Setup Builder</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            animation: fadeInDown 1s ease-out;
+        }
+        
+        .header h1 {
+            font-size: 3rem;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #f7dc6f);
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientFlow 3s ease-in-out infinite;
+            margin-bottom: 10px;
+        }
+        
+        .control-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .panel {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .panel:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .panel h3 {
+            color: #4ecdc4;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #f0f0f0;
+        }
+        
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            font-size: 14px;
+        }
+        
+        .form-group textarea {
+            height: 80px;
+            resize: vertical;
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 5px;
+            font-size: 14px;
+        }
+        
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+        }
+        
+        .btn-success {
+            background: linear-gradient(45deg, #56ab2f, #a8e6cf);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(45deg, #ff416c, #ff4b2b);
+        }
+        
+        .output-section {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .output-section h3 {
+            color: #4ecdc4;
+            margin-bottom: 15px;
+        }
+        
+        .code-output {
+            background: #1a1a1a;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.4;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 1.5s infinite;
+        }
+        
+        .status-success { background: #4ecdc4; }
+        .status-error { background: #ff6b6b; }
+        .status-warning { background: #f7dc6f; }
+        .status-info { background: #45b7d1; }
+        
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #4ecdc4, #45b7d1);
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 10px;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .feature-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.02);
+        }
+        
+        .language-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .lang-chip {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .lang-chip.active {
+            background: linear-gradient(45deg, #4ecdc4, #45b7d1);
+            border-color: white;
+        }
+        
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes gradientFlow {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .floating-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+        
+        .terminal-window {
+            background: #1a1a1a;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .terminal-header {
+            background: #333;
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .terminal-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        
+        .dot-red { background: #ff5f56; }
+        .dot-yellow { background: #ffbd2e; }
+        .dot-green { background: #27ca3f; }
+        
+        .terminal-content {
+            padding: 15px;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.4;
+            min-height: 200px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-particles" id="particles"></div>
+    
+    <div class="container">
+        <div class="header">
+            <h1>🚀 SUPREME LLM AUTO-SETUP BUILDER</h1>
+            <p>Sistem Automasi Pembangunan LLM Multi-Bahasa dengan Teknologi AI Terdepan</p>
+        </div>
+        
+        <div class="control-panel">
+            <div class="panel">
+                <h3>🔧 Konfigurasi Sistem</h3>
+                <div class="form-group">
+                    <label>Nama Projek:</label>
+                    <input type="text" id="projectName" placeholder="supreme-llm-system">
+                </div>
+                <div class="form-group">
+                    <label>Platform Target:</label>
+                    <select id="platform">
+                        <option value="linux">Linux Ubuntu/Debian</option>
+                        <option value="macos">macOS</option>
+                        <option value="windows">Windows 10/11</option>
+                        <option value="docker">Docker Container</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Arsitektur Prosesor:</label>
+                    <select id="architecture">
+                        <option value="x64">x86_64 (Intel/AMD)</option>
+                        <option value="arm64">ARM64 (Apple Silicon/ARM)</option>
+                        <option value="auto">Auto-Detect</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="panel">
+                <h3>🧠 Model LLM Configuration</h3>
+                <div class="form-group">
+                    <label>Model Base:</label>
+                    <select id="modelBase">
+                        <option value="llama2">Llama 2 (Meta)</option>
+                        <option value="mistral">Mistral 7B</option>
+                        <option value="codellama">Code Llama</option>
+                        <option value="vicuna">Vicuna</option>
+                        <option value="gpt4all">GPT4All</option>
+                        <option value="custom">Custom Model</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Quantization:</label>
+                    <select id="quantization">
+                        <option value="q4_0">Q4_0 (Recommended)</option>
+                        <option value="q4_1">Q4_1</option>
+                        <option value="q5_0">Q5_0 (Higher Quality)</option>
+                        <option value="q5_1">Q5_1</option>
+                        <option value="q8_0">Q8_0 (Best Quality)</option>
+                        <option value="f16">F16 (Full Precision)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Memory Allocation (GB):</label>
+                    <input type="number" id="memoryAlloc" value="8" min="4" max="64">
+                </div>
+            </div>
+            
+            <div class="panel">
+                <h3>🌐 Multi-Language Support</h3>
+                <div class="language-selector">
+                    <div class="lang-chip active" data-lang="en">English</div>
+                    <div class="lang-chip active" data-lang="ms">Bahasa Malaysia</div>
+                    <div class="lang-chip" data-lang="id">Indonesian</div>
+                    <div class="lang-chip" data-lang="zh">中文</div>
+                    <div class="lang-chip" data-lang="ja">日本語</div>
+                    <div class="lang-chip" data-lang="ko">한국어</div>
+                    <div class="lang-chip" data-lang="ar">العربية</div>
+                    <div class="lang-chip" data-lang="hi">हिन्दी</div>
+                    <div class="lang-chip" data-lang="th">ไทย</div>
+                    <div class="lang-chip" data-lang="vi">Tiếng Việt</div>
+                </div>
+                <div class="form-group">
+                    <label>Custom Training Data:</label>
+                    <textarea id="customData" placeholder="Masukkan data latihan tambahan..."></textarea>
+                </div>
+            </div>
+            
+            <div class="panel">
+                <h3>⚡ Performance Optimization</h3>
+                <div class="form-group">
+                    <label>GPU Acceleration:</label>
+                    <select id="gpuAccel">
+                        <option value="cuda">NVIDIA CUDA</option>
+                        <option value="rocm">AMD ROCm</option>
+                        <option value="metal">Apple Metal</option>
+                        <option value="vulkan">Vulkan</option>
+                        <option value="cpu">CPU Only</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Thread Count:</label>
+                    <input type="number" id="threadCount" value="8" min="1" max="32">
+                </div>
+                <div class="form-group">
+                    <label>Batch Size:</label>
+                    <input type="number" id="batchSize" value="512" min="128" max="2048">
+                </div>
+            </div>
+        </div>
+        
+        <div class="feature-grid">
+            <div class="feature-card">
+                <h4>🔄 Auto-Update System</h4>
+                <p>Kemaskini automatik model dan dependensi</p>
+                <button class="btn btn-primary" onclick="enableAutoUpdate()">Aktifkan</button>
+            </div>
+            <div class="feature-card">
+                <h4>🛠️ Error Recovery</h4>
+                <p>Pemulihan automatik dari kegagalan sistem</p>
+                <button class="btn btn-success" onclick="setupErrorRecovery()">Setup</button>
+            </div>
+            <div class="feature-card">
+                <h4>📊 Performance Monitor</h4>
+                <p>Pemantauan real-time prestasi sistem</p>
+                <button class="btn btn-primary" onclick="startMonitoring()">Mulakan</button>
+            </div>
+            <div class="feature-card">
+                <h4>🔐 Security Hardening</h4>
+                <p>Keselamatan tingkat enterprise</p>
+                <button class="btn btn-danger" onclick="applySecurity()">Laksanakan</button>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin: 30px 0;">
+            <button class="btn" style="font-size: 18px; padding: 15px 40px;" onclick="generateSupremeScript()">
+                🚀 GENERATE SUPREME SETUP SCRIPT
+            </button>
+            <button class="btn btn-success" onclick="deploySystem()">⚡ DEPLOY INSTANTLY</button>
+            <button class="btn btn-primary" onclick="validateSystem()">✅ VALIDATE CONFIG</button>
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressBar"></div>
+        </div>
+        
+        <div class="output-section">
+            <h3><span class="status-indicator status-success"></span>Supreme Setup Script Output</h3>
+            <div class="terminal-window">
+                <div class="terminal-header">
+                    <div class="terminal-dot dot-red"></div>
+                    <div class="terminal-dot dot-yellow"></div>
+                    <div class="terminal-dot dot-green"></div>
+                    <span style="color: #fff; margin-left: 10px; font-size: 12px;">supreme-llm-builder.sh</span>
+                </div>
+                <div class="terminal-content" id="terminalOutput">
+                    <div style="color: #4ecdc4;">🚀 Supreme LLM Auto-Setup Builder v2.0</div>
+                    <div style="color: #f7dc6f;">📡 Initializing system diagnostics...</div>
+                    <div style="color: #45b7d1;">🔍 Scanning environment capabilities...</div>
+                    <div style="color: #ff6b6b;">⚠️  Ready to generate custom setup script!</div>
+                    <div style="color: #4ecdc4;">💡 Click "GENERATE SUPREME SETUP SCRIPT" to begin automation</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="output-section">
+            <h3>📋 Generated Bash Command</h3>
+            <div class="code-output" id="bashOutput">
+                Menunggu konfigurasi untuk menghasilkan skrip automasi...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize particles
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + 'vw';
+                particle.style.top = Math.random() * 100 + 'vh';
+                particle.style.animationDelay = Math.random() * 6 + 's';
+                particle.style.animationDuration = (6 + Math.random() * 4) + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // Language selector functionality
+        document.querySelectorAll('.lang-chip').forEach(chip => {
+            chip.addEventListener('click', function() {
+                this.classList.toggle('active');
+            });
+        });
+
+        // Progress bar animation
+        function updateProgress(percentage) {
+            const progressBar = document.getElementById('progressBar');
+            progressBar.style.width = percentage + '%';
+        }
+
+        // Terminal output functions
+        function addTerminalOutput(message, type = 'info') {
+            const terminal = document.getElementById('terminalOutput');
+            const colors = {
+                info: '#4ecdc4',
+                success: '#4ecdc4',
+                warning: '#f7dc6f',
+                error: '#ff6b6b',
+                command: '#45b7d1'
+            };
+            
+            const line = document.createElement('div');
+            line.style.color = colors[type] || colors.info;
+            line.textContent = message;
+            terminal.appendChild(line);
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        function clearTerminal() {
+            document.getElementById('terminalOutput').innerHTML = '';
+        }
+
+        // Main generation function
+        function generateSupremeScript() {
+            clearTerminal();
+            updateProgress(0);
+            
+            const projectName = document.getElementById('projectName').value || 'supreme-llm-system';
+            const platform = document.getElementById('platform').value;
+            const architecture = document.getElementById('architecture').value;
+            const modelBase = document.getElementById('modelBase').value;
+            const quantization = document.getElementById('quantization').value;
+            const memoryAlloc = document.getElementById('memoryAlloc').value;
+            const gpuAccel = document.getElementById('gpuAccel').value;
+            const threadCount = document.getElementById('threadCount').value;
+            const batchSize = document.getElementById('batchSize').value;
+            
+            // Get selected languages
+            const selectedLangs = Array.from(document.querySelectorAll('.lang-chip.active'))
+                .map(chip => chip.dataset.lang);
+            
+            addTerminalOutput('🚀 Memulakan Supreme LLM Setup Builder...', 'info');
+            updateProgress(10);
+            
+            setTimeout(() => {
+                addTerminalOutput('📊 Menganalisis konfigurasi sistem...', 'command');
+                addTerminalOutput(`✅ Projek: ${projectName}`, 'success');
+                addTerminalOutput(`✅ Platform: ${platform}`, 'success');
+                addTerminalOutput(`✅ Model: ${modelBase} (${quantization})`, 'success');
+                addTerminalOutput(`✅ Bahasa: ${selectedLangs.join(', ')}`, 'success');
+                updateProgress(30);
+            }, 1000);
+            
+            setTimeout(() => {
+                addTerminalOutput('🔧 Menjanakan skrip automasi...', 'command');
+                addTerminalOutput('📦 Menyediakan dependensi...', 'info');
+                updateProgress(50);
+            }, 2000);
+            
+            setTimeout(() => {
+                addTerminalOutput('⚡ Mengoptimumkan konfigurasi...', 'command');
+                addTerminalOutput('🛠️ Menyediakan error recovery...', 'info');
+                updateProgress(70);
+            }, 3000);
+            
+            setTimeout(() => {
+                addTerminalOutput('✨ Skrip automasi selesai dijana!', 'success');
+                addTerminalOutput('📋 Salinan kod bash tersedia di bawah', 'info');
+                updateProgress(100);
+                
+                generateBashScript(projectName, platform, architecture, modelBase, quantization, memoryAlloc, gpuAccel, threadCount, batchSize, selectedLangs);
+            }, 4000);
+        }
+
+        function generateBashScript(projectName, platform, architecture, modelBase, quantization, memoryAlloc, gpuAccel, threadCount, batchSize, languages) {
+            const bashScript = `#!/bin/bash
+# 🚀 SUPREME LLM AUTO-SETUP BUILDER v2.0
+# Sistem Automasi Pembangunan LLM Multi-Bahasa
+# Generated: ${new Date().toISOString()}
+
+set -euo pipefail
+
+# Warna untuk output
+RED='\\033[0;31m'
+GREEN='\\033[0;32m'
+YELLOW='\\033[1;33m'
+BLUE='\\033[0;34m'
+PURPLE='\\033[0;35m'
+CYAN='\\033[0;36m'
+NC='\\033[0m'
+
+# Fungsi log
+log_info() { echo -e "\${CYAN}[INFO]\${NC} $1"; }
+log_success() { echo -e "\${GREEN}[SUCCESS]\${NC} $1"; }
+log_warning() { echo -e "\${YELLOW}[WARNING]\${NC} $1"; }
+log_error() { echo -e "\${RED}[ERROR]\${NC} $1"; }
+
+# Konfigurasi Projek
+PROJECT_NAME="${projectName}"
+PLATFORM="${platform}"
+ARCHITECTURE="${architecture}"
+MODEL_BASE="${modelBase}"
+QUANTIZATION="${quantization}"
+MEMORY_ALLOC="${memoryAlloc}"
+GPU_ACCEL="${gpuAccel}"
+THREAD_COUNT="${threadCount}"
+BATCH_SIZE="${batchSize}"
+LANGUAGES=(${languages.map(l => `"${l}"`).join(' ')})
+
+# Direktori
+PROJECT_DIR="\$HOME/\$PROJECT_NAME"
+MODELS_DIR="\$PROJECT_DIR/models"
+CONFIG_DIR="\$PROJECT_DIR/config"
+LOGS_DIR="\$PROJECT_DIR/logs"
+SCRIPTS_DIR="\$PROJECT_DIR/scripts"
+
+# Fungsi setup direktori
+setup_directories() {
+    log_info "📁 Menyediakan struktur direktori..."
+    mkdir -p "\$PROJECT_DIR" "\$MODELS_DIR" "\$CONFIG_DIR" "\$LOGS_DIR" "\$SCRIPTS_DIR"
+    cd "\$PROJECT_DIR"
+    log_success "Direktori projek disediakan: \$PROJECT_DIR"
+}
+
+# Deteksi sistem
+detect_system() {
+    log_info "🔍 Mengesan sistem..."
+    
+    # Deteksi OS
+    if [[ "\$OSTYPE" == "linux-gnu"* ]]; then
+        DETECTED_OS="linux"
+    elif [[ "\$OSTYPE" == "darwin"* ]]; then
+        DETECTED_OS="macos"
+    elif [[ "\$OSTYPE" == "msys" || "\$OSTYPE" == "cygwin" ]]; then
+        DETECTED_OS="windows"
+    else
+        DETECTED_OS="unknown"
+    fi
+    
+    # Deteksi GPU
+    if command -v nvidia-smi &> /dev/null; then
+        GPU_SUPPORT="nvidia"
+        log_success "NVIDIA GPU dikesan"
+    elif command -v rocm-smi &> /dev/null; then
+        GPU_SUPPORT="amd"
+        log_success "AMD GPU dikesan"
+    else
+        GPU_SUPPORT="cpu"
+        log_warning "Tiada GPU dikesan, menggunakan CPU"
+    fi
+    
+    # Deteksi RAM
+    if [[ "\$DETECTED_OS" == "linux" ]]; then
+        TOTAL_RAM=\$(free -g | awk 'NR==2{print \$2}')
+    elif [[ "\$DETECTED_OS" == "macos" ]]; then
+        TOTAL_RAM=\$((\$(sysctl -n hw.memsize) / 1024 / 1024 / 1024))
+    fi
+    
+    log_info "OS: \$DETECTED_OS, GPU: \$GPU_SUPPORT, RAM: \${TOTAL_RAM}GB"
+}
+
+# Install dependensi
+install_dependencies() {
+    log_info "📦 Memasang dependensi..."
+    
+    case "\$DETECTED_OS" in
+        "linux")
+            # Update sistem
+            sudo apt update && sudo apt upgrade -y
+            
+            # Dependensi asas
+            sudo apt install -y build-essential cmake git curl wget \
+                python3 python3-pip python3-venv \
+                libopenblas-dev liblapack-dev \
+                pkg-config libssl-dev
+            
+            # CUDA untuk NVIDIA
+            if [[ "\$GPU_ACCEL" == "cuda" ]]; then
+                log_info "🚀 Memasang CUDA..."
+                wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/cuda-ubuntu2004.pin
+                sudo mv cuda-ubuntu2004.pin /etc/apt/preferences.d/cuda-repository-pin-600
+                wget https://developer.download.nvidia.com/compute/cuda/12.2.0/local_installers/cuda-repo-ubuntu2004-12-2-local_12.2.0-535.54.03-1_amd64.deb
+                sudo dpkg -i cuda-repo-ubuntu2004-12-2-local_12.2.0-535.54.03-1_amd64.deb
+                sudo cp /var/cuda-repo-ubuntu2004-12-2-local/cuda-*-keyring.gpg /usr/share/keyrings/
+                sudo apt-get update
+                sudo apt-get install -y cuda
+            fi
+            ;;
+        "macos")
+            # Homebrew
+            if ! command -v brew &> /dev/null; then
+                /bin/bash -c "\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+            fi
+            
+            brew install cmake git python3 llvm
+            ;;
+    esac
+    
+    log_success "Dependensi berjaya dipasang"
+}
+
+# Setup Python environment
+setup_python_env() {
+    log_info "🐍 Menyediakan persekitaran Python..."
+    
+    python3 -m venv venv
+    source venv/bin/activate
+    
+    pip install --upgrade pip
+    pip install torch torchvision torchaudio
+    pip install transformers accelerate
+    pip install llama-cpp-python
+    pip install langchain
+    pip install fastapi uvicorn
+    pip install streamlit
+    pip install gradio
+    
+    log_success "Persekitaran Python disediakan"
+}
+
+# Download model
+download_model() {
+    log_info "📥 Memuat turun model \$MODEL_BASE..."
+    
+    cd "\$MODELS_DIR"
+    
+    case "\$MODEL_BASE" in
+        "llama2")
+            MODEL_URL="https://huggingface.co/TheBloke/Llama-2-7B-Chat-GGML/resolve/main/llama-2-7b-chat.\${QUANTIZATION}.bin"
+            ;;
+        "mistral")
+            MODEL_URL="https://huggingface.co/TheBloke/Mistral-7B-Instruct-v0.1-GGML/resolve/main/mistral-7b-instruct-v0.1.\${QUANTIZATION}.bin"
+            ;;
+        "codellama")
+            MODEL_URL="https://huggingface.co/TheBloke/CodeLlama-7B-Instruct-GGML/resolve/main/codellama-7b-instruct.\${QUANTIZATION}.bin"
+            ;;
+    esac
+    
+    if [[ -n "\$MODEL_URL" ]]; then
+        wget -O "model.\${QUANTIZATION}.bin" "\$MODEL_URL"
+        log_success "Model berjaya dimuat turun"
+    else
